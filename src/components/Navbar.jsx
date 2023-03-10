@@ -1,5 +1,10 @@
-const Navbar = ({isLoggedIn, isHomepage}) => {
+import SearchBox from "./SearchBox.jsx";
+import {useState} from "react";
+import {useNavigate} from "react-router-dom";
 
+const Navbar = ({isLoggedIn, isHomepage}) => {
+    const [searchTerm, setSearch] = useState('');
+    const navigate = useNavigate();
     if (isHomepage || !isLoggedIn) {
         return (
             <nav
@@ -39,12 +44,10 @@ const Navbar = ({isLoggedIn, isHomepage}) => {
 
                     </div>
                     <div>
-                        <div
-                            className="hidden md:flex bg-extremelightGray2 rounded-full items-center pl-3 outline outline-extremelightGray outline-2 focus-within:outline-lightGray">
-                            <img src="/src/assets/search.svg" className="h-5"/>
-                            <input type="text"
-                                   className="bg-extremelightGray2 rounded-full py-2 px-4 focus:outline-none"/>
-                        </div>
+                        <SearchBox onSearch={(value) => {
+                            setSearch(value);
+                            navigate('/posts')
+                        }} hideInSM={true}/>
                     </div>
                 </div>
                 <div className="flex gap-10 items-center">
@@ -55,10 +58,10 @@ const Navbar = ({isLoggedIn, isHomepage}) => {
                     <div className="relative group">
 
                         <div className="flex items-center gap-2">
-                            <img src="/src/assets/person-circle.svg" alt="" className="w-8 aspect-square"/>
+                            <img src="/src/assets/person-circle.svg" alt="" className="w-8 aspect-square fill-blue"/>
                             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
                                  xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                <path fillRule="evenodd" clipRule="evenodd"
                                       d="M3.07994 4.11999C3.00291 4.06222 2.90763 4.03417 2.81159 4.041C2.71554 4.04782 2.62518 4.08906 2.5571 4.15715C2.48901 4.22523 2.44777 4.31559 2.44095 4.41164C2.43412 4.50768 2.46217 4.60296 2.51994 4.67999L5.99994 8.16799L9.47994 4.67999C9.52579 4.64561 9.56371 4.60177 9.59114 4.55145C9.61857 4.50114 9.63487 4.44551 9.63894 4.38835C9.643 4.33118 9.63473 4.27381 9.61469 4.22012C9.59465 4.16643 9.56331 4.11767 9.52278 4.07715C9.48226 4.03663 9.4335 4.00528 9.37981 3.98524C9.32612 3.9652 9.26875 3.95694 9.21159 3.961C9.15442 3.96506 9.0988 3.98136 9.04848 4.00879C8.99816 4.03622 8.95433 4.07414 8.91994 4.11999L5.99994 7.03199L3.07994 4.11999Z"
                                       fill="black"/>
                             </svg>

@@ -1,26 +1,19 @@
 import {useContext, useState} from "react";
 import {Context} from "../App.jsx";
 import Input from "../components/Input.jsx";
-import Notification from "../components/Notification.jsx";
+import CheckMail from "../components/CheckMail.jsx";
+import {Link} from "react-router-dom";
 
 const Login = () => {
-    const {baseURL} = useContext(Context);
+    const {baseURL, fetchData, showNotification} = useContext(Context);
+
     const [mailSent, setMailSent] = useState(false);// if mail is already sent or not
     const [msg, setMsg] = useState('');
     const [mail, setMail] = useState('');
     const submitForm = async (e) => {
         e.preventDefault();
-        console.log(baseURL);
         // const [data, error] = useFetch(baseURL + '/login', 'POST', {mail});
-        const response = await fetch(baseURL + '/login', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({mail})
-        })
-        const data = await response.json();
+        const data = await fetchData(`/api/v1/login`, 'POST', {mail, redirect: `${window.location.origin}/verify`});
         console.log(data);
         if (data.success) {
             setMailSent(true);
@@ -31,11 +24,7 @@ const Login = () => {
     }
 
     if (mailSent) {
-        return (
-            <div className={'h-screen text-center text-2xl grid place-content-center'}>
-                {msg}
-            </div>
-        )
+        return (<CheckMail/>)
     }
     return (
         <div className={'h-screen'}>
@@ -50,17 +39,14 @@ const Login = () => {
                     <Input type={'submit'} content={'Sign in'}/>
                     <span className="absolute bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap">
                 Don't have an account?
-                <a href="registration.html" className="mx-1 text-blue underline underline-offset-2">
+                <Link to={"/register"} className="mx-1 text-blue underline underline-offset-2">
                     create a new one
-                </a>
+                </Link>
             </span>
                 </form>
 
             </div>
-            {msg &&
-                <Notification content={msg} hideMe={() => {
-                    setMsg(null);
-                }}/>}
+            {msg && showNotification(msg)}
         </div>
     );
 };

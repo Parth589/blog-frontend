@@ -1,17 +1,17 @@
 import React, {useContext, useState} from 'react';
 import Input from "../components/Input.jsx";
 import {Context} from "../App.jsx";
-import Notification from "../components/Notification.jsx";
+import {Link} from "react-router-dom";
 
 const SignUp = () => {
-    const {baseURL} = useContext(Context);
+    const {baseURL, showNotification} = useContext(Context);
     const [username, setUsername] = useState('')
     const [mail, setMail] = useState('');
     const [completedSignup, setCompleteSignup] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await fetch(baseURL + '/register', {
+        const response = await fetch(baseURL + '/api/v1/register', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -33,7 +33,8 @@ const SignUp = () => {
         return (
             <main className={'h-screen grid place-content-center text-center text-2xl '}>
                 <span>
-                Registration has been completed. <a href="/login.html" className={'text-blue '}>Login</a>
+                Registration has been completed.
+                    <Link to={"/login"} className={'text-blue '}>Login</Link>
                 </span>
             </main>
         );
@@ -52,14 +53,12 @@ const SignUp = () => {
                     <Input type={'submit'} content={'Sign up'}/>
                 </form>
                 <span className="text-center absolute bottom-10 left-1/2 -translate-x-1/2">Already have an account?
-                <a href="index.html" className="text-blue underline underline-offset-2">
+                <Link to={'/login'} className="text-blue underline underline-offset-2">
                     sign in
-                </a>
+                </Link>
             </span>
             </div>
-            {errorMsg && <Notification content={errorMsg} hideMe={()=>{
-                setErrorMsg(null);
-            }}/>}
+            {errorMsg && showNotification(errorMsg)}
         </main>
     );
 };

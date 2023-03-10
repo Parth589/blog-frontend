@@ -1,8 +1,12 @@
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
+import {useContext} from "react";
+import {Context} from "../App.jsx";
 
 const Landing = () => {
+    const {}=useContext(Context);
     return (<>
+        <Navbar isHomepage={true} isLoggedIn={true}/>
             <main>
                 <section
                     className="bg-yellow py-20 lg:px-20 pl-7 pr-10 flex flex-col items-start border-b border-extremelightGray border-b-1 gap-5 ">
