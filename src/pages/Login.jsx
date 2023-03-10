@@ -1,14 +1,15 @@
-import {useContext, useRef, useState} from "react";
+import {useContext, useState} from "react";
 import {Context} from "../App.jsx";
+import Input from "../components/Input.jsx";
+import Notification from "../components/Notification.jsx";
 
-const Login = (props) => {
-    const inputRef = useRef(null);
+const Login = () => {
     const {baseURL} = useContext(Context);
-    const [mailsent, setMailsent] = useState(false);// if mail is already sent or not
+    const [mailSent, setMailSent] = useState(false);// if mail is already sent or not
     const [msg, setMsg] = useState('');
+    const [mail, setMail] = useState('');
     const submitForm = async (e) => {
         e.preventDefault();
-        const mail = inputRef.current.value;
         console.log(baseURL);
         // const [data, error] = useFetch(baseURL + '/login', 'POST', {mail});
         const response = await fetch(baseURL + '/login', {
@@ -22,14 +23,14 @@ const Login = (props) => {
         const data = await response.json();
         console.log(data);
         if (data.success) {
-            setMailsent(true);
+            setMailSent(true);
             setMsg(data.msg);
         } else {
             setMsg(data.msg);
         }
     }
 
-    if (mailsent) {
+    if (mailSent) {
         return (
             <div className={'h-screen text-center text-2xl grid place-content-center'}>
                 {msg}
@@ -45,16 +46,8 @@ const Login = (props) => {
                 </div>
 
                 <form className="flex flex-col gap-5 w-fit" onSubmit={submitForm}>
-                    <div className="flex flex-col gap-1">
-                        <label htmlFor="email">Email</label>
-                        <input ref={inputRef} type="email"
-                               className="focus:outline-green outline outline-1 outline-darkGray w-80 rounded-md px-3 py-2"/>
-                    </div>
-
-                    <button type={'submit'}
-                            className=" font-semibold px-3 py-2 outline outline-2 bg-green text-white rounded-md hover:bg-slate-600">
-                        Sign in
-                    </button>
+                    <Input label={'Email'} id={'email'} type={'email'} state={mail} setState={setMail}/>
+                    <Input type={'submit'} content={'Sign in'}/>
                     <span className="absolute bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap">
                 Don't have an account?
                 <a href="registration.html" className="mx-1 text-blue underline underline-offset-2">
@@ -64,6 +57,10 @@ const Login = (props) => {
                 </form>
 
             </div>
+            {msg &&
+                <Notification content={msg} hideMe={() => {
+                    setMsg(null);
+                }}/>}
         </div>
     );
 };
