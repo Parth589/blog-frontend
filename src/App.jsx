@@ -8,6 +8,7 @@ import FinishLogin from "./pages/FinishLogin.jsx";
 import fetchData from "./utils/FetchData.jsx"
 import Edit from "./pages/Edit.jsx";
 import Notification from "./components/Notification.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 export const Context = createContext({});
 
@@ -58,6 +59,7 @@ function App() {
                 <Route path={'/posts'} element={<List/>}/>
                 <Route path={'/verify'} element={<FinishLogin setLoggedIn={setLoggedIn}/>}/>
                 <Route path={'/edit'} element={<Edit/>}/>
+                <Route path={'*'} element={<NotFound/>}/>
             </Routes>
             {
                 notification.isShowing &&
