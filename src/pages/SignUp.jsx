@@ -4,22 +4,14 @@ import {Context} from "../App.jsx";
 import {Link} from "react-router-dom";
 
 const SignUp = () => {
-    const {baseURL, showNotification} = useContext(Context);
+    const {showNotification,fetchData} = useContext(Context);
     const [username, setUsername] = useState('')
     const [mail, setMail] = useState('');
     const [completedSignup, setCompleteSignup] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await fetch(baseURL + '/api/v1/register', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({mail, username})
-        })
-        const data = await response.json();
+        const data = await fetchData('/api/v1/register','POST',{mail, username});
         console.log(data);
         if (data.success) {
             setErrorMsg('')

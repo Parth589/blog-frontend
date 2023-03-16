@@ -1,4 +1,3 @@
-// FIXME: get this thing done ASAP
 import React, {useContext, useEffect, useState} from 'react';
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {Context} from "../App.jsx";
