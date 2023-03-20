@@ -21,21 +21,6 @@ const FinishLogin = (props) => {
         const data = await fetchData(`/api/v1/verify?token=${token}`, 'GET');
         if (data.success) {
             setMsg('Successful Authentication');
-            props.setLoggedIn(true)
-            const {id} = jwtDecode(token);
-        //     make api call to get the user details
-            const {success,data}=await fetchData(`/api/v1/user/${id}`,'GET');
-            console.log({success,data})
-            if(!success){
-                setMsg('something went wrong');
-                return;
-            }
-            console.log(data);
-            setUserInfo({
-                id:data._id,
-                username:data.username,
-                mail:data.mail
-            });
             navigate('/posts')
         } else {
             console.log('something went wrong')

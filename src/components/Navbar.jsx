@@ -1,6 +1,6 @@
 import SearchBox from "./SearchBox.jsx";
 import {useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 const Navbar = ({isLoggedIn, isHomepage}) => {
     const [searchTerm, setSearch] = useState('');
@@ -17,18 +17,18 @@ const Navbar = ({isLoggedIn, isHomepage}) => {
                 <div className="flex gap-7 items-center">
                     <ul className="flex gap-5 items-center hidden md:flex">
                         <li>
-                            <a href="" className="whitespace-nowrap">Our story</a>
+                            <Link to={'/about'} className="whitespace-nowrap">Our story</Link>
                         </li>
                         <li>
-                            <a href="" className="whitespace-nowrap">Write</a>
+                            <Link to={'/edit?new=true'} className="whitespace-nowrap">Write</Link>
                         </li>
                         <li>
-                            <a href="" className="whitespace-nowrap">Sign In</a>
+                            <Link to={'/login'} className="whitespace-nowrap">Sign In</Link>
                         </li>
                     </ul>
-                    <a href=""
+                    <Link to={'/register'}
                        className="bg-green text-white px-7 py-2 rounded-full hover:bg-darkGray whitespace-nowrap">Get
-                        started</a>
+                        started</Link>
                 </div>
             </nav>
         );
@@ -46,15 +46,15 @@ const Navbar = ({isLoggedIn, isHomepage}) => {
                     <div>
                         <SearchBox onSearch={(value) => {
                             setSearch(value);
-                            navigate('/posts')
+                            navigate(`/posts?q=${value}`)
                         }} hideInSM={true}/>
                     </div>
                 </div>
                 <div className="flex gap-10 items-center">
-                    <a href="" className=" gap-2 hidden md:flex">
+                    <Link to="/edit?new=true" className=" gap-2 hidden md:flex">
                         <img src="/src/assets/write.svg" alt=""/>
                         <span>Write</span>
-                    </a>
+                    </Link>
                     <div className="relative group">
 
                         <div className="flex items-center gap-2">
@@ -68,7 +68,7 @@ const Navbar = ({isLoggedIn, isHomepage}) => {
 
                         </div>
                         {/* drop down*/}
-                        <div className="absolute bg-white px-7 py-5 right-0 top-full hidden group-hover:block">
+                        <div className="absolute z-20 outline outline-1 outline-extremelightGray bg-white px-7 py-5 right-0 top-full hidden group-hover:block">
                             <ul className="text-lg flex flex-col gap-2 w-32 pb-5">
                                 <li>
                                     <a href="">profile</a>
@@ -80,12 +80,14 @@ const Navbar = ({isLoggedIn, isHomepage}) => {
                                 </li>
 
                                 <li>
-                                    <a href="">write</a>
+                                    <Link to="/edit?new=true">write</Link>
                                     <hr className="text-extremelightGray mt-1"/>
                                 </li>
 
                                 <li className="text-red">
-                                    <a href="">log out</a>
+                                    <span onClick={()=>{
+                                        // call the function logout
+                                    }} className={'cursor-pointer'}>log out</span>
                                     <hr className="text-extremelightGray mt-1"/>
                                 </li>
 

@@ -4,6 +4,8 @@ import {useContext, useEffect, useState} from "react";
 import {Context} from "../App.jsx";
 import Card from "../components/Card.jsx";
 import CardCompact from "../components/CardCompact.jsx";
+import Categories from "../components/Categories.jsx";
+import {Link} from "react-router-dom";
 
 const Landing = () => {
     const {isLoggedIn, fetchData} = useContext(Context);
@@ -32,9 +34,9 @@ const Landing = () => {
                 <br/>
                 from writers on any topic.
             </span>
-                <a href={'listview.html'} className="btn-primary !mx-0 my-5 !px-14 !py-2 !text-lg hover:bg-darkGray">
+                <Link to={'/posts'} className="btn-primary !mx-0 my-5 !px-14 !py-2 !text-lg hover:bg-darkGray">
                     Start Reading
-                </a>
+                </Link>
             </section>
             <hr/>
             <section className="px-7 md:px-10 border-extremelightGray border-b-2">
@@ -135,40 +137,17 @@ const Landing = () => {
                     </div>
                 </section>
                 <div className="lg:flex flex-row-reverse  ">
-                    <div className="lg:sticky md:h-fit md:top-0 basis-1/3">
-            <span className=" text-md  uppercase pt-14 items-center gap-2 py-10 px-7 flex font-bold "> <img
-                src="/src/assets/compass.svg" className="w-5"/>Discover More categories</span>
-
-                        <div className=" border-extremelightGray border-b-2 pb-20 md:pb-10 ">
-                            <ul className=" flex flex-wrap px-7 gap-5 items-center text-lightGray  ">
-                                <li className="tagg "><a href="search.html?search=Data Science"> Data
-                                    Science </a></li>
-                                <li className="tagg "><a href="search.html?search=Technology"> Technology </a>
-                                </li>
-                                <li className="tagg "><a href="search.html?search=Writing"> Writing </a></li>
-                                <li className="tagg "><a
-                                    href="search.html?search=Relationships"> Relationships </a>
-                                </li>
-                                <li className="tagg "><a href="search.html?search=Machine Learning"> Machine
-                                    Learning </a></li>
-                                <li className="tagg "><a
-                                    href="search.html?search=Productivity"> Productivity </a></li>
-                                <li className="tagg "><a href="search.html?search=Politics"> Politics </a></li>
-                            </ul>
-
-                        </div>
-                        <Footer desktop={true}/>
-                    </div>
+                    <Categories/>
                     <div className="pt-14 pb-20 px-1 sm:px-7 py-7  basis-2/3">
                         <ol className="gap-14 grid grid-cols-1  " id="non-compact-card-wrapper">
                             {
-                                loading?
-                                <>
-                                    <li>
-                                        <div className="md:card3 px-5  flex justify-between md:items-center gap-5">
-                                            <div className="gap-2 items-center ">
-                                                <div className="flex gap-2 items-center">
-                                                    <div
+                                loading ?
+                                    <>
+                                        <li>
+                                            <div className="md:card3 px-5  flex justify-between md:items-center gap-5">
+                                                <div className="gap-2 items-center ">
+                                                    <div className="flex gap-2 items-center">
+                                                        <div
                                                         className="w-7 h-7 aspect-square bg-extremelightGray animate-pulse rounded-full"></div>
                                                     <span
                                                         className="w-32 py-3 animate-pulse bg-extremelightGray rounded">
