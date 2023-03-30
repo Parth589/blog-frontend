@@ -10,7 +10,7 @@ module.exports = {
     fontFamily: {
       sans: ['Inter', 'sans-serif'],
       serif: ['Cormorant Garamond', 'serif'],
-      serif2: ['Domine', 'serif'],
+      serif2: ['Unna', 'serif'],
       mono: ['Roboto Mono', 'monospace']
     },
     colors: {

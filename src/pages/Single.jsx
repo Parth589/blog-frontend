@@ -134,7 +134,7 @@ const Single = () => {
                      className="w-full aspect-video object-cover md:max-w-2xl mx-auto"/>
                 {/* post */}
                 <article
-                    className="prose prose-lg prose-img:p-5 py-10 [word-spacing:3px] md:max-w-2xl leading-7 md:pt-28 break-words"
+                    className="prose prose-lg prose-img:p-5 py-10 w-full [word-spacing:3px] md:max-w-2xl leading-7 md:pt-28 break-words"
                     dangerouslySetInnerHTML={{__html: getSanitizedHTML()}}>
                 </article>
 

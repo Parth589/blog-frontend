@@ -6,6 +6,7 @@ import {Context} from "../App.jsx";
 import showdown from "showdown";
 import dompurify from "dompurify";
 
+
 const Edit = () => {
     const [formPageState, setFormPageState] = useState(0);
     const [title, setTitle] = useState('')
@@ -77,7 +78,7 @@ const Edit = () => {
                 navigate(`/blog/${data._id}`);
             }
         } else {
-            const {success,data,msg} = await fetchData(`/api/v1/auth/blog/update/${queryParams.get('id')}`, 'PUT', {
+            const {success, data, msg} = await fetchData(`/api/v1/auth/blog/update/${queryParams.get('id')}`, 'PUT', {
                 title: title,
                 keywords: keywords.split(','),
                 content: content,
@@ -119,7 +120,8 @@ const Edit = () => {
 
                     <div className="px-3 md:px-20 h-full w-full">
                         {(isPreview && formPageState !== 1) ? (
-                            <div className={'prose prose-xl'} dangerouslySetInnerHTML={{__html: getSanitizedHTML()}}>
+                            <div className={'prose prose-xl font-sans'}
+                                 dangerouslySetInnerHTML={{__html: getSanitizedHTML()}}>
 
                             </div>
                         ) : (
@@ -132,11 +134,27 @@ const Edit = () => {
                                         setTitle(e.target.value)
                                     }}
                                            className="bg-inherit w-full text-5xl font-medium focus:outline-none focus:border-none py-3"/>
-                                    {/* TODO: add tab to insert a \t into the value */}
-                                    <textarea placeholder="Tell your story..." value={content} onChange={(e) => {
+                                    <textarea onKeyDown={(e) => {
+                                        if(e.key==='`'){
+                                            e.preventDefault();
+                                            setContent(prevState => prevState+'`');
+                                            return;
+                                        }
+                                        if (e.key === 'Tab' && !e.shiftKey) {
+                                            e.preventDefault();
+                                            const value = e.target.value;
+                                            const selectionStart = e.target.selectionStart;
+                                            const selectionEnd = e.target.selectionEnd;
+                                            setContent(
+                                                value.substring(0, selectionStart) + '\t' + value.substring(selectionEnd));
+                                            e.target.selectionStart = selectionEnd + 2 - (selectionEnd - selectionStart);
+                                            e.target.selectionEnd = selectionEnd + 2 - (selectionEnd - selectionStart);
+                                        }
+
+                                    }} placeholder="Tell your story..." value={content} onChange={(e) => {
                                         setContent(e.target.value)
                                     }}
-                                              className="bg-inherit  resize-none w-full h-full mb-7 text-xl focus:outline-none focus:border-none"></textarea>
+                                              className="bg-inherit resize-none w-full h-full mb-7 text-2xl tracking-wide focus:outline-none focus:border-none"></textarea>
 
                                 </div>
 
