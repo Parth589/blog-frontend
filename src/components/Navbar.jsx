@@ -1,19 +1,20 @@
 import SearchBox from "./SearchBox.jsx";
-import {useState} from "react";
+import {useContext} from "react";
 import {Link, useNavigate} from "react-router-dom";
+import {Context} from "../App.jsx";
 
 const Navbar = ({isLoggedIn, isHomepage}) => {
-    const [searchTerm, setSearch] = useState('');
     const navigate = useNavigate();
+    const {fetchData, verifyUserByCookies, user} = useContext(Context)
     if (isHomepage || !isLoggedIn) {
         return (
             <nav
-                className={`w-full flex flex-nowrap justify-between ${isHomepage ? 'bg-yellow' : 'bg-white'} px-5 md:px-7 py-3 border-b border-b-lightGray`}>
-                <div className="flex items-center gap-3 md:gap-6">
+                className={`z-50 w-full flex flex-nowrap justify-between ${isHomepage ? 'bg-yellow' : 'bg-white'} px-5 md:px-7 py-3 border-b border-b-lightGray`}>
+                <Link to={'/'} className="flex items-center gap-3 md:gap-6">
 
-                    <img src="/src/assets/logo.svg" className=" w-10 md:w-12 aspect-square"/>
+                    <img src="/src/assets/logo.svg" className=" w-10 md:w-12 aspect-square" alt={'The Quill'}/>
                     <span className="font-serif font-bold text-2xl md:text-3xl whitespace-nowrap">The Quill</span>
-                </div>
+                </Link>
                 <div className="flex gap-7 items-center">
                     <ul className="flex gap-5 items-center hidden md:flex">
                         <li>
@@ -36,16 +37,15 @@ const Navbar = ({isLoggedIn, isHomepage}) => {
     if (isLoggedIn) {
         return (
             <nav
-                className="w-full flex flex-nowrap justify-between bg-white px-5 md:px-7 py-3 border-b  border-extremelightGray">
+                className=" z-50 w-full flex flex-nowrap justify-between bg-white px-5 md:px-7 py-3 border-b  border-extremelightGray">
                 <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-3 md:gap-6">
+                    <Link to={'/'} className="flex items-center gap-3 md:gap-6">
 
-                        <img src="/src/assets/logo.svg" className=" w-10 md:w-12 aspect-square"/>
+                        <img src="/src/assets/logo.svg" className=" w-10 md:w-12 aspect-square" alt={'The Quill'}/>
 
-                    </div>
+                    </Link>
                     <div>
                         <SearchBox onSearch={(value) => {
-                            setSearch(value);
                             navigate(`/posts?q=${value}`)
                         }} hideInSM={true}/>
                     </div>
@@ -71,11 +71,11 @@ const Navbar = ({isLoggedIn, isHomepage}) => {
                         <div className="absolute z-20 outline outline-1 outline-extremelightGray bg-white px-7 py-5 right-0 top-full hidden group-hover:block">
                             <ul className="text-lg flex flex-col gap-2 w-32 pb-5">
                                 <li>
-                                    <a href="">profile</a>
+                                    <Link to={`/user/${user._id}`}>profile</Link>
                                     <hr className="text-extremelightGray mt-1"/>
                                 </li>
                                 <li>
-                                    <a href="">bookmarks</a>
+                                    <Link to={'/posts?bookmarks=true'}>bookmarks</Link>
                                     <hr className="text-extremelightGray mt-1"/>
                                 </li>
 
@@ -85,8 +85,13 @@ const Navbar = ({isLoggedIn, isHomepage}) => {
                                 </li>
 
                                 <li className="text-red">
-                                    <span onClick={()=>{
+                                    <span onClick={async () => {
                                         // call the function logout
+                                        await fetchData('/api/v1/logout', 'GET');
+                                        // document.cookie='';
+                                        verifyUserByCookies();
+                                        console.log('logout');
+                                        navigate('/');
                                     }} className={'cursor-pointer'}>log out</span>
                                     <hr className="text-extremelightGray mt-1"/>
                                 </li>

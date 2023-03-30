@@ -1,25 +1,28 @@
-import {useContext, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {Context} from "../App.jsx";
 import Input from "../components/Input.jsx";
 import CheckMail from "../components/CheckMail.jsx";
 import {Link} from "react-router-dom";
 
 const Login = () => {
-    const {baseURL, fetchData, showNotification} = useContext(Context);
+    const {fetchData,showNotification} = useContext(Context);
 
     const [mailSent, setMailSent] = useState(false);// if mail is already sent or not
-    const [msg, setMsg] = useState('');
+    const [errorMsg, setErrorMsg] = useState('');
     const [mail, setMail] = useState('');
+
+    useEffect(()=>{
+        showNotification(errorMsg);
+    },[errorMsg])
     const submitForm = async (e) => {
         e.preventDefault();
         // const [data, error] = useFetch(baseURL + '/login', 'POST', {mail});
         const data = await fetchData(`/api/v1/login`, 'POST', {mail, redirect: `${window.location.origin}/verify`});
-        console.log(data);
         if (data.success) {
             setMailSent(true);
-            setMsg(data.msg);
+            setErrorMsg(data.msg);
         } else {
-            setMsg(data.msg);
+            setErrorMsg(data.msg);
         }
     }
 
@@ -38,15 +41,14 @@ const Login = () => {
                     <Input label={'Email'} id={'email'} type={'email'} state={mail} setState={setMail}/>
                     <Input type={'submit'} content={'Sign in'}/>
                     <span className="absolute bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                Don't have an account?
-                <Link to={"/register"} className="mx-1 text-blue underline underline-offset-2">
-                    create a new one
-                </Link>
-            </span>
+                        Don't have an account?
+                        <Link to={"/register"} className="mx-1 text-blue underline underline-offset-2">
+                            create a new one
+                        </Link>
+                    </span>
                 </form>
 
             </div>
-            {msg && showNotification(msg)}
         </div>
     );
 };

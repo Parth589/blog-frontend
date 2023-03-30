@@ -1,18 +1,15 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {Context} from "../App.jsx";
-import jwtDecode from "jwt-decode";
 
-const FinishLogin = (props) => {
-    const navigate=useNavigate();
-    const [queryParams, setQueryParams] = useSearchParams();
+const FinishLogin = () => {
+    const navigate = useNavigate();
+    const [queryParams] = useSearchParams();
     // const obj=useParams();
-    console.log(queryParams.get('token'));
     const [msg, setMsg] = useState('Loading...')
-    const {baseURL, fetchData, setUserInfo} = useContext(Context);
+    const {fetchData, verifyUserByCookies} = useContext(Context);
     const effectHandler = async () => {
         const token = queryParams.get('token');
-        console.log(token);
         if (!token) {
             setMsg('token is not passed');
             return;
@@ -21,9 +18,10 @@ const FinishLogin = (props) => {
         const data = await fetchData(`/api/v1/verify?token=${token}`, 'GET');
         if (data.success) {
             setMsg('Successful Authentication');
+            verifyUserByCookies();
             navigate('/posts')
         } else {
-            console.log('something went wrong')
+            console.error('something went wrong')
             setMsg('Something went wrong');
         }
     }

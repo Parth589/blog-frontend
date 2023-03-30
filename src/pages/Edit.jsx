@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {useSearchParams} from "react-router-dom";
+import {useNavigate, useSearchParams} from "react-router-dom";
 import Input from "../components/Input.jsx";
 import Navbar from "../components/Navbar.jsx";
 import {Context} from "../App.jsx";
@@ -15,7 +15,7 @@ const Edit = () => {
     const [brief, setBrief] = useState('')
     const [isPreview, setPreview] = useState(false);
     const [queryParams, setQueryParams] = useSearchParams();
-    const {isLoggedIn, fetchData} = useContext(Context);
+    const {isLoggedIn, fetchData, showNotification} = useContext(Context);
 
     const converter = new showdown.Converter();
     const effect = async () => {
@@ -24,9 +24,11 @@ const Edit = () => {
             return setQueryParams({
                 new: true
             })
+        } else if (queryParams.get('id') && queryParams.get('new')) {
+            queryParams.delete('new');
+            setQueryParams(queryParams);
         }
         if (!queryParams.get('new')) {
-            console.log('h')
             const id = queryParams.get('id');
             if (id) {
                 //     make api call to get blogs data
@@ -36,7 +38,6 @@ const Edit = () => {
                     console.error(msg);
                     return
                 }
-                console.log(data);
                 //     update states according to that data
                 setTitle(data.content.title);
                 setContent(converter.makeMd(data.content.post));
@@ -46,20 +47,53 @@ const Edit = () => {
             }
         }
     }
+    const navigate = useNavigate();
     useEffect(() => {
+        if (!isLoggedIn) {
+            navigate('/login');
+            return;
+        }
         effect();
     }, []);
-    const handlePublishClick = (e) => {
+    const handlePublishClick = async (e) => {
         e.preventDefault()
         if (formPageState === 0) {
             return setFormPageState(1);
         }
         //     publish the blog
-        console.log('publish....')
+        console.log('publish....');
+        if (queryParams.get('new')) {
+            const {success, msg, data} = await fetchData('/api/v1/auth/blog/create', 'POST', {
+                title: title,
+                keywords: keywords.split(','),
+                content: content,
+                thumbnail_link: thumbnail_link,
+                brief: brief
+            })
+            if (!success) {
+                showNotification(msg);
+            } else {
+                showNotification('post created successfully');
+                navigate(`/blog/${data._id}`);
+            }
+        } else {
+            const {success,data,msg} = await fetchData(`/api/v1/auth/blog/update/${queryParams.get('id')}`, 'PUT', {
+                title: title,
+                keywords: keywords.split(','),
+                content: content,
+                thumbnail_link: thumbnail_link,
+                brief: brief
+            })
+            if (!success) {
+                showNotification(msg);
+            } else {
+                showNotification('post created successfully');
+                navigate(`/blog/${data._id}`);
+            }
+        }
     }
 
     const getSanitizedHTML = () => {
-        console.log('function called')
         return dompurify.sanitize(converter.makeHtml(content));
     }
     return (
@@ -80,11 +114,11 @@ const Edit = () => {
                         Publish
                     </button>
                 </div>
-                <form className="flex flex-col items-start px-5 font-serif h-full relative max-w-6xl w-full"
+                <form className="flex flex-col items-start px-5 font-serif2 h-full relative max-w-6xl w-full"
                       onSubmit={handlePublishClick}>
 
                     <div className="px-3 md:px-20 h-full w-full">
-                        {isPreview ? (
+                        {(isPreview && formPageState !== 1) ? (
                             <div className={'prose prose-xl'} dangerouslySetInnerHTML={{__html: getSanitizedHTML()}}>
 
                             </div>
@@ -98,6 +132,7 @@ const Edit = () => {
                                         setTitle(e.target.value)
                                     }}
                                            className="bg-inherit w-full text-5xl font-medium focus:outline-none focus:border-none py-3"/>
+                                    {/* TODO: add tab to insert a \t into the value */}
                                     <textarea placeholder="Tell your story..." value={content} onChange={(e) => {
                                         setContent(e.target.value)
                                     }}

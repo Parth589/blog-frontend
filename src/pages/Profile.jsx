@@ -11,7 +11,6 @@ const Profile = () => {
     const {isLoggedIn, fetchData, user} = useContext(Context);
     const [userData, setUserData] = useState({})
     const [userPosts, setUserPosts] = useState([]);
-    const [isOwnProfile, setOwnProfile] = useState(false);
     const effect = async () => {
         const {success, data, msg} = await fetchData(`/api/v1/user/${id}`);
         if (!success) {
@@ -52,13 +51,18 @@ const Profile = () => {
             <Navbar isHomepage={false} isLoggedIn={isLoggedIn}/>
             <main className=" p-5 items-center flex-col px-7">
                 {error ? <span className={'text-red text-xl font-bold'}>{error}</span> :
-                    <>
-                        <div className="flex justify-between p-5 pb-0">
-                            <div className="hidden lg:block font-semibold text-5xl py-12 px-5">{userData.username}</div>
-                            <div className={'px-5'}>
+                    <div className={'grid  lg:grid-cols-[1fr_auto]'}>
+                        {/*component 1 : big username*/}
+                        <div className="hidden lg:block font-semibold text-5xl py-12 px-5">{userData.username}</div>
+                        {/*component 2 : user details*/}
+                        <div
+                            className="flex w-full bg-white lg:sticky lg:top-0 h-fit justify-between w-fit  lg:p-5 pb-0 row-span-2">
+                            <div className={'lg:px-5 w-full'}>
 
                                 <div className="flex flex-col ">
-                                    <img src="/src/assets/profile1.svg" alt="user"
+                                    <img src={`/api/v1/userProfile/${userData._id}`} onError={(e)=>{
+                                        e.src='/src/assets/person-circle.svg'
+                                    }} alt="user"
                                          className="w-20 aspect-square"/>
                                     <span className="block text-lg font-semibold mt-4">{userData.username}</span>
 
@@ -71,10 +75,14 @@ const Profile = () => {
                                             src="/src/assets/envelope.svg" alt="" className="invert"/> E-mail
                                     </a>
                                 </div>
+                                <hr className={'text-extremelightGray'}/>
+
+                                <Footer desktop={true}/>
                             </div>
                         </div>
+                        {/*component 3 : user posts*/}
                         <div className="flex ">
-                            <div className="lg:px-7">
+                            <div className="lg:px-7 w-full">
                                 <div>
                                     <div className="pb-12">
                                         <div className="pt-12 ">
@@ -87,7 +95,7 @@ const Profile = () => {
                                         {userPosts.map(e => {
                                             return (
                                                 <div key={e._id}>
-                                                    <Card title={e.content.title}/>
+                                                    <Card blog={e} isEditable={e.author.id === user?._id?.toString()}/>
                                                 </div>
                                             );
                                         })}
@@ -95,7 +103,7 @@ const Profile = () => {
                                 </div>
                             </div>
                         </div>
-                    </>
+                    </div>
                 }
             </main>
             <Footer desktop={false}/>

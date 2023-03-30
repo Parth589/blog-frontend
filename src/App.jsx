@@ -6,23 +6,22 @@ import SignUp from "./pages/SignUp.jsx";
 import List from "./pages/List.jsx";
 import FinishLogin from "./pages/FinishLogin.jsx";
 import fetchData from "./utils/FetchData.jsx"
-import Edit from "./pages/Edit.jsx";
-import Notification from "./components/Notification.jsx";
-import NotFound from "./pages/NotFound.jsx";
-import Profile from "./pages/Profile.jsx";
 import getCookie from "./utils/getCookies.jsx";
 import jwtDecode from "jwt-decode";
+import Edit from "./pages/Edit.jsx";
+import Profile from "./pages/Profile.jsx";
+import Single from "./pages/Single.jsx";
+import About from "./pages/About.jsx";
+import NotFound from "./pages/NotFound.jsx";
+import Notification from "./components/Notification.jsx";
 
 export const Context = createContext({});
 
 function App() {
     const [isLoggedIn, setLoggedIn] = useState(false);
-    const [notification, setNotification] = useState({
-        isShowing: false,
-        content: ''
-    })
 
-    const [bookmarkList, setBookmarkList] = useState([]);
+    const [popup,setPopup]=useState('');
+    const [bookmarkList, setBookmarkList] = useState(null);
     const fetchBookmarks = () => {
         let data = localStorage.getItem('__bookmarks__');
         if (!data) {
@@ -40,80 +39,98 @@ function App() {
         setBookmarkList(data);
     }
     const addBookmark = (post) => {
-        setBookmarkList(prevState => prevState.push(post))
+        console.log('adding bookmark', post)
+        setBookmarkList(prevState => {
+            return [...prevState, {id: post.id}]
+        })
     }
     const removeBookmark = (post) => {
-        setBookmarkList(prevState => prevState.filter(e => e !== post));
+        console.log('removing bookmark', post)
+        setBookmarkList(prevState => prevState.filter(e => e.id !== post.id));
+    }
+
+
+    const checkBookmark = (post) => {
+        if (bookmarkList !== null)
+            for (let i = 0; i < bookmarkList.length; i++) {
+                if (bookmarkList[i].id === post.id) {
+                    return true;
+                }
+            }
+        return false
     }
     const toggleBookmark = (post) => {
-        if (bookmarkList.indexOf(post) !== -1) {
+        // return: isBookmarked
+        if (checkBookmark(post)) {
             // the post is in bookmarkList
-            return removeBookmark(post);
+            removeBookmark(post);
+            return false;
         } else {
-            return addBookmark(post);
+            addBookmark(post);
+            return true;
         }
-    }
-    const showNotification = (msg) => {
-        setNotification({
-            isShowing: true,
-            content: msg
-        })
     }
     const [user, setUserInfo] = useState({});
 
-    const effect = async () => {
+
+    const verifyUserByCookies = async () => {
         const token = getCookie('__login_token')
-        console.log(token);
         if (!token) {
+            setLoggedIn(false);
+            setUserInfo({});
             return;
         }
         const obj = jwtDecode(token);
-        // console.log(obj)
         //     make a request to get user information
         const {success, data, msg} = await fetchData(`/api/v1/user/${obj.id}`, 'GET');
         if (success) {
             setUserInfo(data);
-            // console.log(data);
             setLoggedIn(true);
         } else {
             console.error(msg);
         }
+    }
+    const effect = () => {
+        verifyUserByCookies();
         fetchBookmarks();
     }
     useEffect(() => {
         effect();
     }, [])
-
+    useEffect(() => {
+        if (bookmarkList === null) {
+            return;
+        }
+        localStorage.setItem('__bookmarks__', JSON.stringify(bookmarkList));
+    }, [bookmarkList])
     const contextValues = {
         fetchData,
         isLoggedIn,
         user,
         setUserInfo,
-        showNotification,
         bookmarkList,
-        toggleBookmark
+        toggleBookmark,
+        checkBookmark,
+        verifyUserByCookies,
+        showNotification:setPopup
     }
     return (
         <Context.Provider value={contextValues}>
             <Routes>
-                <Route path={'/'} element={<Landing/>}/>
+                <Route path={'/'} element={isLoggedIn ? <List/> : <Landing/>}/>
                 <Route path={'/login'} element={<Login/>}/>
                 <Route path={'/register'} element={<SignUp/>}/>
                 <Route path={'/posts'} element={<List/>}/>
-                <Route path={'/verify'} element={<FinishLogin setLoggedIn={setLoggedIn}/>}/>
-                <Route path={'/edit'} element={<Edit/>}/>
+                <Route path={'/verify'}
+                       element={<FinishLogin verifyUserByCookies={verifyUserByCookies}/>}/>
                 <Route path={'/user/:id'} element={<Profile/>}/>
+                <Route path={'/blog/:id'} element={<Single/>}/>
+                <Route path={'/about'} element={<About/>}/>
+
+                <Route path={'/edit'} element={<Edit/>}/>
                 <Route path={'*'} element={<NotFound/>}/>
             </Routes>
-            {
-                notification.isShowing &&
-                <Notification content={notification.content} hideMe={() => {
-                    setNotification({
-                        isShowing: false,
-                        content: ''
-                    })
-                }}/>
-            }
+            <Notification content={popup} />
         </Context.Provider>
     )
 }

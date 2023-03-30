@@ -1,10 +1,10 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import Input from "../components/Input.jsx";
 import {Context} from "../App.jsx";
 import {Link} from "react-router-dom";
 
 const SignUp = () => {
-    const {showNotification,fetchData} = useContext(Context);
+    const {fetchData,showNotification} = useContext(Context);
     const [username, setUsername] = useState('')
     const [mail, setMail] = useState('');
     const [completedSignup, setCompleteSignup] = useState(false);
@@ -12,15 +12,17 @@ const SignUp = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const data = await fetchData('/api/v1/register','POST',{mail, username});
-        console.log(data);
         if (data.success) {
             setErrorMsg('')
+
             setCompleteSignup(true);
         } else {
             setErrorMsg(data.msg);
         }
     }
-
+    useEffect(()=>{
+        showNotification(errorMsg);
+    },[errorMsg])
     if (completedSignup) {
         return (
             <main className={'h-screen grid place-content-center text-center text-2xl '}>
@@ -50,7 +52,6 @@ const SignUp = () => {
                 </Link>
             </span>
             </div>
-            {errorMsg && showNotification(errorMsg)}
         </main>
     );
 };

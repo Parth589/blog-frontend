@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=Inter&family=Roboto+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Domine&display=swap');
 
 
 @tailwind base;
@@ -31,4 +32,15 @@
 
 .card3 h6 {
     @apply font-semibold text-xl
+}
+
+/* utility classes to hide scrollbar */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+/* For IE, Edge and Firefox */
+.scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }
