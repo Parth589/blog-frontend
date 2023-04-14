@@ -1,21 +1,18 @@
-import {useContext, useEffect, useState} from "react";
+import { useContext, useEffect, useState } from "react";
 import SearchBox from "../components/SearchBox.jsx";
 import Navbar from "../components/Navbar.jsx";
-import {Context} from "../App.jsx";
-import {useSearchParams} from "react-router-dom";
+import { Context } from "../App.jsx";
+import { useSearchParams } from "react-router-dom";
 import Categories from "../components/Categories.jsx";
 import Card from "../components/Card.jsx";
 
 const List = () => {
-    const [searchTerm, setSearchTerm] = useState('');
-    const {isLoggedIn, fetchData} = useContext(Context);
+    const { isLoggedIn, fetchData } = useContext(Context);
     const [searchResults, setSearchResults] = useState([]);
     const [queryParams, setQueryParams] = useSearchParams();
-    useEffect(() => {
-        setSearchTerm(queryParams.get('q')?.toString() || '');
-    }, [])
+    const [searchTerm, setSearchTerm] = useState(queryParams.get('q'));
 
-    const fn=async ()=>{
+    const fn = async () => {
         if (queryParams.get('bookmarks')) {
             // get all bookmarks which matches the search term
             let bookmarks = localStorage.getItem('__bookmarks__');
@@ -28,28 +25,25 @@ const List = () => {
             console.log(bookmarks);
             const results = await Promise.all(bookmarks.map(async elem => {
                 //     make request to find the post with elem.id
-                const {success, msg, data} = await fetchData(`/api/v1/blog/${elem.id}?compact=true`, 'GET');
+                const { success, msg, data } = await fetchData(`/api/v1/blog/${elem.id}?compact=true`, 'GET');
                 if (!success) {
                     console.error(msg);
-                    return;
+                    return null;
                 }
                 return data;
             }));
-            if (!searchTerm) {
-                return setSearchResults(results);
-            }
-            // search from bookmarks and then set search results
+            return setSearchResults(results);
 
         }
-    }
+    };
     const effect = async () => {
-        if(queryParams.get('bookmarks'))return fn();
-        if (searchTerm) {
+        if (queryParams.get('bookmarks') !== null) return fn();
+        if (searchTerm !== null) {
             const {
                 success,
                 data,
                 msg
-            } = await fetchData(`/api/v1/blog/search?searchTerm=${searchTerm}`, 'GET')
+            } = await fetchData(`/api/v1/blog/search?searchTerm=${searchTerm}`, 'GET');
             if (!success) {
                 console.error('something went wrong');
                 console.error(msg);
@@ -60,32 +54,24 @@ const List = () => {
                 success,
                 data,
                 msg
-            } = await fetchData(`/api/v1/blogs`, 'GET')
+            } = await fetchData(`/api/v1/blogs`, 'GET');
             if (!success) {
                 console.error('something went wrong');
                 console.error(msg);
             }
             setSearchResults(data);
         }
-    }
+    };
+    useEffect(() => {
+        setSearchTerm(queryParams.get('q'));
+    }, [queryParams]);
     useEffect(() => {
         effect();
-    }, [searchTerm])
-
-    useEffect(() => {
-        if (!queryParams.get('bookmarks')){
-            effect();
-            setSearchTerm(queryParams.get('q')?.toString() || '');
-
-            return
-        }
-        setSearchTerm(queryParams.get('q')?.toString() || '');
-        fn();
-    }, [queryParams])
+    }, [searchTerm]);
 
     return (
         <>
-            <Navbar isHomepage={false} isLoggedIn={isLoggedIn}/>
+            <Navbar isHomepage={false} isLoggedIn={isLoggedIn} />
             <main className={'p-5 md:p-10'}>
 
 
@@ -97,8 +83,8 @@ const List = () => {
                                 setSearchTerm(searchValue);
                                 setQueryParams({
                                     q: searchValue
-                                })
-                            }} hideInSM={false}/>
+                                });
+                            }} hideInSM={false} />
                             <div className={'w-full'}>
 
                                 {searchTerm &&
@@ -108,7 +94,7 @@ const List = () => {
                                                 for: <span
                                                     className={'text-black font-bold text-3xl md:text-5xl tracking-wider'}>{searchTerm}</span>
                                             </h4>
-                                            <hr className={'text-extremelightGray my-3'}/>
+                                            <hr className={'text-extremelightGray my-3'} />
                                         </>
                                     )
                                 }
@@ -118,13 +104,13 @@ const List = () => {
                         {
                             searchResults.map((e) => {
                                 return <div key={e._id}>
-                                    <Card blog={e}/>
-                                    <hr className={'text-extremelightGray w-full'}/>
-                                </div>
+                                    <Card blog={e} />
+                                    <hr className={'text-extremelightGray w-full'} />
+                                </div>;
                             })
                         }
                     </div>
-                    <Categories/>
+                    <Categories />
                 </div>
             </main>
         </>
